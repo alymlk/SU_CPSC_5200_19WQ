@@ -53,6 +53,7 @@ namespace restapi.Controllers
             return timecard;
         }
 
+		// Remove(DELETE) a draft or cancelled timecard														  
         [HttpDelete("{id}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
@@ -122,6 +123,7 @@ namespace restapi.Controllers
             }
         }
 
+		//Replace (POST) a complete line item										 
         [HttpPost("{timecardId}/lines/{lineId}")]
         public IActionResult ReplaceLine(string timecardId, Guid lineId, [FromBody] TimecardLine timecardLine)
         {
@@ -144,6 +146,7 @@ namespace restapi.Controllers
             return Ok(result);
         }
 
+		//Update (PATCH) a line item 								
         [HttpPatch("{timecardId}/lines/{lineId}")]
         public IActionResult UpdateLine(string timecardId, Guid lineId, [FromBody] dynamic timecardLine)
         {
@@ -201,6 +204,11 @@ namespace restapi.Controllers
                     return StatusCode(409, new InvalidStateError() { });
                 }
 
+				//Verify that timecard resource is consistent
+                if (timecard.Resource != submittal.Resource)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
                 if (timecard.Lines.Count < 1)
                 {
                     return StatusCode(409, new EmptyTimecardError() { });
@@ -264,6 +272,12 @@ namespace restapi.Controllers
                     return StatusCode(409, new InvalidStateError() { });
                 }
                 
+				//Verify that timecard resource is consistent
+                if (timecard.Resource != cancellation.Resource)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+				
                 var transition = new Transition(cancellation, TimecardStatus.Cancelled);
                 timecard.Transitions.Add(transition);
                 return Ok(transition);
@@ -322,6 +336,11 @@ namespace restapi.Controllers
                     return StatusCode(409, new InvalidStateError() { });
                 }
                 
+				//Verify that timecard resource is consistent
+                if (timecard.Resource == rejection.Resource)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
                 var transition = new Transition(rejection, TimecardStatus.Rejected);
                 timecard.Transitions.Add(transition);
                 return Ok(transition);
@@ -379,7 +398,12 @@ namespace restapi.Controllers
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
-                
+                //Verify that timecard approver is not timecard resource
+                if (timecard.Resource == approval.Resource)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+
                 var transition = new Transition(approval, TimecardStatus.Approved);
                 timecard.Transitions.Add(transition);
                 return Ok(transition);

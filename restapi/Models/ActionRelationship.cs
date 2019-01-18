@@ -6,10 +6,16 @@ namespace restapi.Models
 
         Cancel,
 
+		Delete,	
+		
         Reject,
 
         Approve,
 
-        RecordLine
+        RecordLine,
+		
+		UpdateLine,
+
+        ReplaceLine   
     }
 }

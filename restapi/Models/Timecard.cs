@@ -72,6 +72,14 @@ namespace restapi.Models
                         Reference = $"/timesheets/{Identity.Value}/cancellation"
                     });
 
+					links.Add(new ActionLink()
+                    {
+                        Method = Method.Delete,
+                        Type = ContentTypes.TimesheetLine,
+                        Relationship = ActionRelationship.Delete,
+                        Reference = $"/timesheets/{Identity.Value}"
+                    });
+					
                     links.Add(new ActionLink() {
                         Method = Method.Post,
                         Type = ContentTypes.Submittal,
@@ -86,6 +94,21 @@ namespace restapi.Models
                         Reference = $"/timesheets/{Identity.Value}/lines"
                     });
                 
+					links.Add(new ActionLink()
+                    {
+                        Method = Method.Post,
+                        Type = ContentTypes.TimesheetLine,
+                        Relationship = ActionRelationship.ReplaceLine,
+                        Reference = $"/timesheets/{Identity.Value}/lines"
+                    });
+
+                    links.Add(new ActionLink()
+                    {
+                        Method = Method.Patch,
+                        Type = ContentTypes.TimesheetLine,
+                        Relationship = ActionRelationship.UpdateLine,
+                        Reference = $"/timesheets/{Identity.Value}/lines"
+                    });
                     break;
 
                 case TimecardStatus.Submitted:
